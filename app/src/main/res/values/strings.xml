@@ -1,4 +1,18 @@
 <resources>
     <string name="app_name">SafeJourney</string>
-    <string name="rsta_motto"></string>
+    <string name="rsta_motto">Your Safety is Our Priority</string>
+    <string name="enter_phone_number">Enter Phone Number</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="forgot_your_password">Forgot Your Password?</string>
+    <string name="dont_t_have_an_account_register">Dont\'t have an Account? Register.</string>
+    <string name="offline_services">Offline Services</string>
+    <string name="login">Login</string>
+    <string name="signup">SignUp</string>
+    <string name="name">Name</string>
+    <string name="password">Password</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="register">Register</string>
 </resources>
