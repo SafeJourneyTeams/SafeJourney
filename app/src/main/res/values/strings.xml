@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">SafeJourney</string>
+<<<<<<< HEAD
     <string name="rsta_motto">Your Safety is Our Priority</string>
     <string name="enter_phone_number">Enter Phone Number</string>
     <string name="enter_password">Enter Password</string>
@@ -15,4 +16,16 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="register">Register</string>
+=======
+    <string name="rsta_motto"></string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+>>>>>>> 37db65f1ce39848da9be4fddb803c5a6e8fb0826
 </resources>
