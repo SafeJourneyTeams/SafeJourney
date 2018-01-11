@@ -61,8 +61,7 @@ public class Registration extends AppCompatActivity {
                 driverSend = (String) rb.getText();
 
                 if(sname.isEmpty() || spassword.length() <6 || sphone.length() !=8){
-                    Snackbar.make(null, "Please Fill Form Fields", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Snackbar.make(findViewById(android.R.id.content), "Please fill all the fields above", Snackbar.LENGTH_LONG).show();
                 }
                 else{
                     reg(sname,sphone,spassword,genderSend,driverSend);
