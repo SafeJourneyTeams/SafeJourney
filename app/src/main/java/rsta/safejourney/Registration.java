@@ -6,7 +6,8 @@ import android.content.SharedPreferences;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,17 +23,24 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
+
+import rsta.safejourney.Urls;
 
 public class Registration extends AppCompatActivity {
 
-    EditText name,phone,password;
-    Button reg;
-    String url="";
+    private EditText name,phone,password;
+    private Button reg;
+    private RequestQueue requestQueue;
     private RadioGroup gender, driver;
-    String genderSend,driverSend;
-
+    private StringRequest request;
+    private String genderSend,driverSend;
+c
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +50,8 @@ public class Registration extends AppCompatActivity {
         phone=(EditText) findViewById(R.id.regPhone);
         password=(EditText) findViewById(R.id.pswd);
         reg=(Button) findViewById(R.id.regButton);
+
+        requestQueue = Volley.newRequestQueue(this);
 
         reg.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -60,10 +70,24 @@ public class Registration extends AppCompatActivity {
                 RadioButton rb = (RadioButton) driver.findViewById(driverSelected);
                 driverSend = (String) rb.getText();
 
-                if(sname.isEmpty() || spassword.length() <6 || sphone.length() !=8){
-                    Snackbar.make(findViewById(android.R.id.content), "Please fill all the fields above", Snackbar.LENGTH_LONG).show();
+                if (TextUtils.isEmpty(sname)) {
+                    name.setError("Please enter name");
+                    name.requestFocus();
+                    return;
                 }
-                else{
+
+                if(checkForMobile()){
+                    phone.setError("Enter a valid phone number");
+                    phone.requestFocus();
+                    return;
+                }
+
+                if (TextUtils.isEmpty(spassword)) {
+                    password.setError("Enter a password");
+                    password.requestFocus();
+                    return;
+                }
+
                     reg(sname,sphone,spassword,genderSend,driverSend);
                     SharedPreferences preferences=getSharedPreferences("regPreference", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor=preferences.edit();
@@ -73,9 +97,9 @@ public class Registration extends AppCompatActivity {
                     editor.putString("password",spassword);
                     editor.putString("gender",genderSend);
                     editor.putString("driver",driverSend);
-                    editor.commit();
+                    editor.apply();
                     show();
-                }
+
             }
         });
     }
@@ -85,35 +109,57 @@ public class Registration extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
-    public void reg(final String name, final String phone, final String password, final String gender, final  String driver){
-       RequestQueue requestQueue = Volley.newRequestQueue(Registration.this);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+    public void reg(final String sname, final String sphone, final String spassword, final String gender, final  String driver){
+
+        request = new StringRequest(Request.Method.POST, Urls.URL_REGISTER, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-
-                Log.i("Hitesh",""+response);
-
+                try {
+                    JSONObject jsonobject = new JSONObject(response);
+                    if (jsonobject.names().get(0).equals("success")) {
+                        Toast.makeText(getApplicationContext(),"Welcome\n"+jsonobject.getString("name"),Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(getApplication(),RegisterSuccess.class));
+                    }
+                    if(jsonobject.has("exist")){
+                        Toast.makeText(getApplicationContext(),""+jsonobject.getString("exist"),Toast.LENGTH_LONG).show();
+                    }
+                    if(jsonobject.has("missingParam")){
+                        Toast.makeText(getApplicationContext(),""+jsonobject.getString("missingParam"),Toast.LENGTH_LONG).show();
+                    }
+                    if(jsonobject.has("dataError")){
+                        Toast.makeText(getApplicationContext(),""+jsonobject.getString("dataError"),Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Log.i("Hitesh",""+error);
-                Toast.makeText(Registration.this, ""+error, Toast.LENGTH_SHORT).show();
-
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> stringMap = new HashMap<>();
-                stringMap.put("name",name);
-                stringMap.put("phone",phone);
-                stringMap.put("password",password);
-                stringMap.put("gender",genderSend);
-                stringMap.put("driver",driverSend);
-                return stringMap;
+                HashMap<String, String> hashMap = new HashMap<String, String>();
+                hashMap.put("name", sname);
+                hashMap.put("phone", sphone);
+                hashMap.put("password", spassword);
+                hashMap.put("gender", genderSend);
+                hashMap.put("driver", driverSend);
+
+                return hashMap;
             }
         };
-        requestQueue.add(stringRequest);
+        requestQueue.add(request);
+    }
+    public boolean checkForMobile() {
+        Context c;
+        String mStrMobile = phone.getText().toString();
+        if (android.util.Patterns.PHONE.matcher(mStrMobile).matches()) {
+            return true;
+        }
+        else
+            return false;
     }
 }
